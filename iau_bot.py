@@ -1,4 +1,5 @@
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram import Update
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 
 # Replace with your bot token
 TOKEN = "7923580511:AAG0ucSbJKhKK17X0LpTiIJWnsl923Aaz8M"
@@ -12,26 +13,24 @@ chatbot_responses = {
 }
 
 # Start command
-def start(update, context):
-    update.message.reply_text("سلام! من چت‌بات دانشگاه آزادم. سوالت چیه؟")
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("سلام! من چت‌بات دانشگاه آزادم. سوالت چیه؟")
 
 # Handle messages
-def handle_message(update, context):
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_message = update.message.text
     response = chatbot_responses.get(user_message, "سوالتو نفهمیدم، واضح‌تر بپرس!")
-    update.message.reply_text(response)
+    await update.message.reply_text(response)
 
 # Main function
 def main():
-    updater = Updater(TOKEN, use_context=True)
-    dp = updater.dispatcher
+    app = Application.builder().token(TOKEN).build()
 
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
-    updater.start_polling()
     print("Bot started!")
-    updater.idle()
+    app.run_polling()
 
 if __name__ == "__main__":
     main()
